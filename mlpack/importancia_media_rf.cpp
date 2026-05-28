@@ -50,11 +50,11 @@ int main(int argc, char* argv[])
     if (argc > 1)
         tipo = stoi(argv[1]);
     else {
-        cout << "Uso: " << argv[0] << " <tipo>  (1 = sem feature eng., 2 = com feature eng., 3 = dados podados 1., 4 = dados podados 2.)" << endl;
+        cout << "Uso: " << argv[0] << " <tipo>  (1=sem FE, 2=com FE, 3=podado1, 4=podado2, 5=augmented)" << endl;
         return 1;
     }
-    if (tipo != 1 && tipo != 2 && tipo != 3 && tipo != 4) {
-        cout << "Tipo inválido. Use 1 ou 2 ou 3." << endl;
+    if (tipo < 1 || tipo > 5) {
+        cout << "Tipo inválido. Use 1, 2, 3, 4 ou 5." << endl;
         return 1;
     }
 
@@ -82,6 +82,13 @@ int main(int argc, char* argv[])
     } else if(tipo == 4){
     	path_train_data   = "dados_podados_2/treinamento_podado_2.csv";
         path_train_labels = "dados_podados_2/labels_treinamento_podado_2.csv";
+        path_val_data     = "dados_podados_2/validacao_podado_2.csv";
+        path_val_labels   = "dados_podados_2/labels_validacao_podado_2.csv";
+    } else if(tipo == 5){
+        // Treina com dados reais + sinteticos balanceados;
+        // valida no mesmo conjunto do PODADO 2 (comparacao justa)
+        path_train_data   = "dados_augmented/treinamento_augmented.csv";
+        path_train_labels = "dados_augmented/labels_treinamento_augmented.csv";
         path_val_data     = "dados_podados_2/validacao_podado_2.csv";
         path_val_labels   = "dados_podados_2/labels_validacao_podado_2.csv";
     }
@@ -155,7 +162,7 @@ int main(int argc, char* argv[])
             "TempRise", "PressureDrop",
             "RainToday"	    	
         }; // 23 features
-    } else if (tipo == 4){
+    } else if (tipo == 4 || tipo == 5){
     	feature_names = {
             "Date_x", "Date_y",
             "Rainfall", "Sunshine",
@@ -167,21 +174,24 @@ int main(int argc, char* argv[])
             "Pressure9am", "Pressure3pm",
             "Cloud3pm",
             "DewDiff3pm", "DewDiff9am",
-            "TempRise", "PressureDrop"  	
-        }; // 21 features   
+            "TempRise", "PressureDrop"
+        }; // 20 features
     }
 
     const size_t numFeatures = valData.n_rows;
 
     // -----------------------------------------------------------------------
-    // 4. Pesos de classe (mesmo cálculo do random_forest.cpp original)
+    // 4. Pesos de classe
+    //    tipo 5 (augmented): classes ja balanceadas 1:1, sem pesos extras
+    //    demais tipos:       chuva tem peso ~3.53 para compensar desbalanco
     // -----------------------------------------------------------------------
-    const double weightNoRain = 1.0;
-    const double weightRain   = 77.9244 / 22.0756; // ~3.53
-
-    arma::rowvec weights(trainLabels.n_elem);
-    for (size_t i = 0; i < trainLabels.n_elem; ++i)
-        weights[i] = (trainLabels[i] == 0) ? weightNoRain : weightRain;
+    arma::rowvec weights(trainLabels.n_elem, arma::fill::ones);
+    if (tipo != 5) {
+        const double weightRain = 77.9244 / 22.0756; // ~3.53
+        for (size_t i = 0; i < trainLabels.n_elem; ++i)
+            if (trainLabels[i] == 1)
+                weights[i] = weightRain;
+    }
 
     // -----------------------------------------------------------------------
     // 5. Hiperparâmetros
@@ -262,7 +272,13 @@ int main(int argc, char* argv[])
     // -----------------------------------------------------------------------
     cout << "\n\n============================================================" << endl;
     cout << "   RESULTADOS FINAIS — MÉDIA DE " << NUM_RUNS << " RODADAS" << endl;
-    cout << "   Tipo: " << (tipo == 1 ? "SEM feature engineering" : "COM feature engineering") << endl;
+    string tipo_label;
+    if      (tipo == 1) tipo_label = "SEM feature engineering";
+    else if (tipo == 2) tipo_label = "COM feature engineering";
+    else if (tipo == 3) tipo_label = "COM feature engineering PODADO 1";
+    else if (tipo == 4) tipo_label = "COM feature engineering PODADO 2";
+    else                tipo_label = "AUGMENTED (PODADO 2 + sintetico)";
+    cout << "   Tipo: " << tipo_label << endl;
     cout << "   Threshold: " << threshold * 100.0 << "%" << endl;
     cout << "============================================================" << endl;
 

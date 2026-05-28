@@ -24,3 +24,9 @@ media_podado_1:
 
 media_podado_2:
 	./importancia_media 4
+
+sintetico:
+	python3 ../gerar_sintetico.py
+
+media_augmented:
+	./importancia_media 5
