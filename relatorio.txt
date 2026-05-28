@@ -1,95 +1,46 @@
 ============================================================
-   RESULTADOS FINAIS — MÉDIA DE 100 RODADAS
+   RESULTADOS FINAIS — MÉDIA DE 1000 RODADAS
    Tipo: SEM feature engineering
    Threshold: 30%
 ============================================================
 
 --- Estatísticas do F1-Score (chuva) ---
-  Média:         72.7258%
-  Desvio Padrão: 1.47216%
-  Mínimo:        69.3878%
-  Máximo:        75.817%
+  Média:         72.8891%
+  Desvio Padrão: 1.67309%
+  Mínimo:        68.4211%
+  Máximo:        78.3784%
 
 --- Importância Média das Features (por permutação) ---
   (ordenado da mais para a menos importante)
   Queda no F1 = quanto o modelo piora ao remover a feature
 
-  1.	Humidity3pm         	Queda média no F1: 17.3082%
-  2.	Sunshine            	Queda média no F1: 8.15152%
-  3.	Humidity9am         	Queda média no F1: 2.62976%
-  4.	Cloud3pm            	Queda média no F1: 2.43224%
-  5.	WindGustSpeed       	Queda média no F1: 1.94851%
-  6.	WindDir3pm_x        	Queda média no F1: 0.611134%
-  7.	Pressure3pm         	Queda média no F1: 0.542735%
-  8.	Date_y              	Queda média no F1: 0.26156%
-  9.	WindDir9am_x        	Queda média no F1: 0.256521%
-  10.	WindDir9am_y        	Queda média no F1: 0.247662%
-  11.	WindDir3pm_y        	Queda média no F1: 0.212705%
-  12.	Rainfall            	Queda média no F1: 0.185786%
-  13.	Date_x              	Queda média no F1: 0.174806%
-  14.	Pressure9am         	Queda média no F1: 0.163427%
-  15.	WindSpeed3pm        	Queda média no F1: 0.0778249%
-  16.	WindGustDir_x       	Queda média no F1: 0.0237708%
-  17.	WindSpeed9am        	Queda média no F1: 0.0142494%
-  18.	Temp9am             	Queda média no F1: -0.0224169%
-  19.	WindGustDir_y       	Queda média no F1: -0.150781%
-  20.	RainToday           	Queda média no F1: -0.194824%
-  21.	Evaporation         	Queda média no F1: -0.198088%
-  22.	Cloud9am            	Queda média no F1: -0.462632%
-  23.	MaxTemp             	Queda média no F1: -0.500518%
-  24.	MinTemp             	Queda média no F1: -0.562101%
-  25.	Temp3pm             	Queda média no F1: -0.637854%
+  1.	Humidity3pm         	Queda média no F1: 17.4669%
+  2.	Sunshine            	Queda média no F1: 8.00855%
+  3.	Humidity9am         	Queda média no F1: 2.33491%
+  4.	Cloud3pm            	Queda média no F1: 2.11823%
+  5.	WindGustSpeed       	Queda média no F1: 1.95435%
+  6.	Pressure3pm         	Queda média no F1: 1.00849%
+  7.	WindDir3pm_x        	Queda média no F1: 0.6595%
+  8.	Date_x              	Queda média no F1: 0.489428%
+  9.	WindDir9am_y        	Queda média no F1: 0.441547%
+  10.	WindDir9am_x        	Queda média no F1: 0.41469%
+  11.	Date_y              	Queda média no F1: 0.391589%
+  12.	WindDir3pm_y        	Queda média no F1: 0.3265%
+  13.	Rainfall            	Queda média no F1: 0.278444%
+  14.	WindSpeed3pm        	Queda média no F1: 0.194286%
+  15.	WindSpeed9am        	Queda média no F1: 0.173128%
+  16.	Temp9am             	Queda média no F1: 0.138562%
+  17.	Pressure9am         	Queda média no F1: 0.1218%
+  18.	WindGustDir_x       	Queda média no F1: 0.113268%
+  19.	WindGustDir_y       	Queda média no F1: 0.098196%
+  20.	Cloud9am            	Queda média no F1: -0.00292635%
+  21.	RainToday           	Queda média no F1: -0.0274168%
+  22.	Evaporation         	Queda média no F1: -0.151082%
+  23.	MinTemp             	Queda média no F1: -0.373401%
+  24.	Temp3pm             	Queda média no F1: -0.488925%
+  25.	MaxTemp             	Queda média no F1: -0.562838%
 
 ============================================================
-
-============================================================
-   RESULTADOS FINAIS — MÉDIA DE 100 RODADAS
-   Tipo: COM feature engineering
-   Threshold: 30%
-============================================================
-
---- Estatísticas do F1-Score (chuva) ---
-  Média:         73.5322%
-  Desvio Padrão: 1.68042%
-  Mínimo:        69.3878%
-  Máximo:        77.6316%
-
---- Importância Média das Features (por permutação) ---
-  (ordenado da mais para a menos importante)
-  Queda no F1 = quanto o modelo piora ao remover a feature
-
-  1.	DewDiff3pm          	Queda média no F1: 7.15375%
-  2.	Sunshine            	Queda média no F1: 5.87575%
-  3.	Humidity3pm         	Queda média no F1: 4.93644%
-  4.	WindGustSpeed       	Queda média no F1: 1.86969%
-  5.	Cloud3pm            	Queda média no F1: 1.33443%
-  6.	PressureDrop        	Queda média no F1: 1.09517%
-  7.	WindDir3pm_x        	Queda média no F1: 0.902184%
-  8.	WindDir9am_x        	Queda média no F1: 0.808121%
-  9.	Date_y              	Queda média no F1: 0.738334%
-  10.	Pressure3pm         	Queda média no F1: 0.708175%
-  11.	Humidity9am         	Queda média no F1: 0.537966%
-  12.	DewDiff9am          	Queda média no F1: 0.50493%
-  13.	TempRise            	Queda média no F1: 0.318315%
-  14.	Date_x              	Queda média no F1: 0.313358%
-  15.	Rainfall            	Queda média no F1: 0.307827%
-  16.	WindDir9am_y        	Queda média no F1: 0.305752%
-  17.	WindDir3pm_y        	Queda média no F1: 0.224918%
-  18.	Pressure9am         	Queda média no F1: 0.186761%
-  19.	WindSpeed3pm        	Queda média no F1: 0.182044%
-  20.	WindGustDir_y       	Queda média no F1: 0.0599502%
-  21.	RainToday           	Queda média no F1: 0.0399544%
-  22.	WindSpeed9am        	Queda média no F1: 0.0391449%
-  23.	WindGustDir_x       	Queda média no F1: 0.0215094%
-  24.	Evaporation         	Queda média no F1: 0.0200065%
-  25.	Temp9am             	Queda média no F1: -0.0149109%
-  26.	Cloud9am            	Queda média no F1: -0.168104%
-  27.	Temp3pm             	Queda média no F1: -0.347182%
-  28.	MaxTemp             	Queda média no F1: -0.395291%
-  29.	MinTemp             	Queda média no F1: -0.79266%
-
-============================================================
-
 ============================================================
    RESULTADOS FINAIS — MÉDIA DE 1000 RODADAS
    Tipo: COM feature engineering
@@ -137,46 +88,46 @@
   29.	MinTemp             	Queda média no F1: -0.534239%
 
 ============================================================
-   RESULTADOS FINAIS — MÉDIA DE 100 RODADAS
+   RESULTADOS FINAIS — MÉDIA DE 1000 RODADAS
    Tipo: COM feature engineering PODADO 1
    Threshold: 30%
 ============================================================
 
 --- Estatísticas do F1-Score (chuva) ---
-  Média:         75.3241%
-  Desvio Padrão: 1.35363%
-  Mínimo:        71.1409%
-  Máximo:        78.1457%
+  Média:         75.4934%
+  Desvio Padrão: 1.2839%
+  Mínimo:        70.7483%
+  Máximo:        80%
 
 --- Importância Média das Features (por permutação) ---
   (ordenado da mais para a menos importante)
   Queda no F1 = quanto o modelo piora ao remover a feature
 
-  1.	DewDiff3pm          	Queda média no F1: 7.6007%
-  2.	Sunshine            	Queda média no F1: 7.03483%
-  3.	Humidity3pm         	Queda média no F1: 5.13739%
-  4.	Cloud3pm            	Queda média no F1: 1.91878%
-  5.	WindGustSpeed       	Queda média no F1: 1.8608%
-  6.	DewDiff9am          	Queda média no F1: 1.12089%
-  7.	Humidity9am         	Queda média no F1: 0.970318%
-  8.	Pressure3pm         	Queda média no F1: 0.951233%
-  9.	WindDir3pm_x        	Queda média no F1: 0.85744%
-  10.	Date_y              	Queda média no F1: 0.636442%
-  11.	PressureDrop        	Queda média no F1: 0.617027%
-  12.	WindDir9am_x        	Queda média no F1: 0.60608%
-  13.	Date_x              	Queda média no F1: 0.579761%
-  14.	TempRise            	Queda média no F1: 0.510139%
-  15.	WindDir3pm_y        	Queda média no F1: 0.418602%
-  16.	Pressure9am         	Queda média no F1: 0.32123%
-  17.	WindGustDir_x       	Queda média no F1: 0.269998%
-  18.	WindSpeed9am        	Queda média no F1: 0.264925%
-  19.	Temp9am             	Queda média no F1: 0.18242%
-  20.	WindSpeed3pm        	Queda média no F1: 0.153726%
-  21.	RainToday           	Queda média no F1: -0.0414027%
-  22.	Rainfall            	Queda média no F1: -0.043415%
-  23.	WindDir9am_y        	Queda média no F1: -0.0466953%
-  24.	WindGustDir_y       	Queda média no F1: -0.0929586%
-  25.	Evaporation         	Queda média no F1: -0.244861%
+  1.	DewDiff3pm          	Queda média no F1: 7.77332%
+  2.	Sunshine            	Queda média no F1: 6.72712%
+  3.	Humidity3pm         	Queda média no F1: 5.62933%
+  4.	WindGustSpeed       	Queda média no F1: 2.01346%
+  5.	Cloud3pm            	Queda média no F1: 1.97024%
+  6.	DewDiff9am          	Queda média no F1: 1.33946%
+  7.	Humidity9am         	Queda média no F1: 1.19901%
+  8.	Pressure3pm         	Queda média no F1: 1.10083%
+  9.	PressureDrop        	Queda média no F1: 0.959888%
+  10.	WindDir3pm_x        	Queda média no F1: 0.901337%
+  11.	TempRise            	Queda média no F1: 0.710387%
+  12.	WindDir9am_x        	Queda média no F1: 0.660491%
+  13.	Date_y              	Queda média no F1: 0.579988%
+  14.	Date_x              	Queda média no F1: 0.518183%
+  15.	Temp9am             	Queda média no F1: 0.425107%
+  16.	Pressure9am         	Queda média no F1: 0.333895%
+  17.	WindDir3pm_y        	Queda média no F1: 0.300737%
+  18.	WindSpeed3pm        	Queda média no F1: 0.258284%
+  19.	WindGustDir_x       	Queda média no F1: 0.239582%
+  20.	WindSpeed9am        	Queda média no F1: 0.138941%
+  21.	Rainfall            	Queda média no F1: 0.0914702%
+  22.	WindDir9am_y        	Queda média no F1: 0.0772531%
+  23.	RainToday           	Queda média no F1: 0.0156265%
+  24.	WindGustDir_y       	Queda média no F1: 0.00462103%
+  25.	Evaporation         	Queda média no F1: -0.0330414%
 
 ============================================================
 
@@ -218,6 +169,24 @@
   20.	WindDir9am_y        	Queda média no F1: 0.107795%
 
 ============================================================
+
+===============================================
+         RESULTADOS (THRESHOLD: 30%) PODADOS 2
+===============================================
+Total de dias avaliados:        339
+Acurácia Global:                89.0855%
+Recall  (Sensibilidade Chuva):  74.6667%
+Precisão (Acerto do Alarme):    75.6757%
+F1-Score:                       75.1678%
+
+--- Matriz de Confusão ---
+                 | Realidade: Choveu  | Realidade: Sol
+-----------------|--------------------|----------------
+Previu: Chuva(1) | TP: 56             | FP: 18 (Alarme Falso)
+Previu: Sol  (0) | FN: 19 (Não avisou)| TN: 246
+=======================================================
+
+
 
 
  
