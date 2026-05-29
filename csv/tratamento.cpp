@@ -187,7 +187,7 @@ void _tratamento_(string arquivo, ofstream& arquivo_saida, ofstream& labels_said
                               << diff_temp << ","
                               << diff_press << ","
                               << (rainToday == "Yes" ? 1 : 0) << "\n";
-            else if (tipo == 4)
+            else if (tipo == 4 || tipo == 5 || tipo == 6 || tipo == 7 || tipo ==8)
                 arquivo_saida << data_formatada_x << ","
                               << data_formatada_y << ","
                               << rainfall << ","
@@ -208,7 +208,6 @@ void _tratamento_(string arquivo, ofstream& arquivo_saida, ofstream& labels_said
                               << diferencaManha << ","
                               << diff_temp << ","
                               << diff_press << "\n";
-
             labels_saida << (rainTomorrow == "Yes" ? 1 : 0) << "\n";
         }
         count_year_days++; // incremento único por linha, independente de ser pulada ou não
@@ -226,6 +225,10 @@ void _tratamento_(string arquivo, ofstream& arquivo_saida, ofstream& labels_said
     TIPO 2 => COM FEATURES DERIVADAS
     TIPO 3 => COM FEATURES DERIVADAS PODADO 1
     TIPO 4 => COM FEATURES DERIVADAS PODADO 2
+    TIPO 5 => IGUAL AO TIPO 4, MAS TRATANDO DADOS DO SMOTE 0.4
+    TIPO 6 => IGUAL AO TIPO 4, MAS TRATANDO DADOS DO SMOTE 0.5
+    TIPO 7 => IGUAL AO TIPO 4, MAS TRATANDO DADOS DO SMOTE 0.75
+    TIPO 8 => IGUAL AO TIPO 4, MAS TRATANDO DADOS DO SMOTE 1.0
 */
 int main(int argc, char *argv[])
 {
@@ -233,51 +236,92 @@ int main(int argc, char *argv[])
     if (argc > 1) {
         tipo = stoi(argv[1]);
     } else {
-        cout << "Uso: " << argv[0] << " <tipo: 1 | 2 | 3 | 4>" << endl;
+        cout << "Uso: " << argv[0] << " <tipo: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8>" << endl;
         return 1;
     }
 
     if (tipo == 1) {
-        ofstream treinamento_saida("treinamento_tratado_sem.csv");
+        ofstream treinamento_saida("dados_sem_feature/treinamento_tratado_sem.csv");
         treinamento_saida << "Date_x,Date_y,MinTemp,MaxTemp,RainFall,Evaporation,Sunshine,WindGustDir_x,WindGustDir_y,WindGustSpeed,WindDir9am_x,WindDir9am_y,WindDir3pm_x,WindDir3pm_y,WindSpeed9am,WindSpeed3pm,Humidity9am,Humidity3pm,Pressure9am,Pressure3pm,Cloud9am,Cloud3pm,Temp9am,Temp3pm,RainToday\n";
-        ofstream labels_treinamento_saida("labels_treinamento_sem.csv");
-        ofstream validacao_saida("validacao_tratado_sem.csv");
+        ofstream labels_treinamento_saida("dados_sem_feature/labels_treinamento_sem.csv");
+        ofstream validacao_saida("dados_sem_feature/validacao_tratado_sem.csv");
         validacao_saida << "Date_x,Date_y,MinTemp,MaxTemp,RainFall,Evaporation,Sunshine,WindGustDir_x,WindGustDir_y,WindGustSpeed,WindDir9am_x,WindDir9am_y,WindDir3pm_x,WindDir3pm_y,WindSpeed9am,WindSpeed3pm,Humidity9am,Humidity3pm,Pressure9am,Pressure3pm,Cloud9am,Cloud3pm,Temp9am,Temp3pm,RainToday\n";
-        ofstream labels_validacao_saida("labels_validacao_sem.csv");
+        ofstream labels_validacao_saida("dados_sem_feature/labels_validacao_sem.csv");
         _tratamento_("treinamento.csv", treinamento_saida, labels_treinamento_saida, tipo);
         _tratamento_("validacao.csv", validacao_saida, labels_validacao_saida, tipo);
 
     } else if (tipo == 2) {
-        ofstream treinamento_saida("treinamento_tratado_com.csv");
+        ofstream treinamento_saida("dados_com_feature/treinamento_tratado_com.csv");
         treinamento_saida << "Date_x,Date_y,MinTemp,MaxTemp,RainFall,Evaporation,Sunshine,WindGustDir_x,WindGustDir_y,WindGustSpeed,WindDir9am_x,WindDir9am_y,WindDir3pm_x,WindDir3pm_y,WindSpeed9am,WindSpeed3pm,Humidity9am,Humidity3pm,Pressure9am,Pressure3pm,Cloud9am,Cloud3pm,Temp9am,Temp3pm,dewDiffTemp3pm,dewDiffTemp9am,diffTemp3pm9am,diffPress3pm9am,RainToday\n";
-        ofstream labels_treinamento_saida("labels_treinamento_com.csv");
-        ofstream validacao_saida("validacao_tratado_com.csv");
+        ofstream labels_treinamento_saida("dados_com_feature/labels_treinamento_com.csv");
+        ofstream validacao_saida("dados_com_feature/validacao_tratado_com.csv");
         validacao_saida << "Date_x,Date_y,MinTemp,MaxTemp,RainFall,Evaporation,Sunshine,WindGustDir_x,WindGustDir_y,WindGustSpeed,WindDir9am_x,WindDir9am_y,WindDir3pm_x,WindDir3pm_y,WindSpeed9am,WindSpeed3pm,Humidity9am,Humidity3pm,Pressure9am,Pressure3pm,Cloud9am,Cloud3pm,Temp9am,Temp3pm,dewDiffTemp3pm,dewDiffTemp9am,diffTemp3pm9am,diffPress3pm9am,RainToday\n";
-        ofstream labels_validacao_saida("labels_validacao_com.csv");
+        ofstream labels_validacao_saida("dados_com_feature/labels_validacao_com.csv");
         _tratamento_("treinamento.csv", treinamento_saida, labels_treinamento_saida, tipo);
         _tratamento_("validacao.csv", validacao_saida, labels_validacao_saida, tipo);
 
     } else if (tipo == 3) {
-        ofstream treinamento_saida("treinamento_podado.csv");
+        ofstream treinamento_saida("dados_podados_1/treinamento_podado.csv");
         treinamento_saida << "Date_x,Date_y,RainFall,Evaporation,Sunshine,WindGustDir_x,WindGustDir_y,WindGustSpeed,WindDir9am_x,WindDir9am_y,WindDir3pm_x,WindDir3pm_y,WindSpeed9am,WindSpeed3pm,Humidity9am,Humidity3pm,Pressure9am,Pressure3pm,Cloud3pm,Temp9am,dewDiffTemp3pm,dewDiffTemp9am,diffTemp3pm9am,diffPress3pm9am,RainToday\n";
-        ofstream labels_treinamento_saida("labels_treinamento_podado.csv");
-        ofstream validacao_saida("validacao_podado.csv");
+        ofstream labels_treinamento_saida("dados_podados_1/labels_treinamento_podado.csv");
+        ofstream validacao_saida("dados_podados_1/validacao_podado.csv");
         validacao_saida << "Date_x,Date_y,RainFall,Evaporation,Sunshine,WindGustDir_x,WindGustDir_y,WindGustSpeed,WindDir9am_x,WindDir9am_y,WindDir3pm_x,WindDir3pm_y,WindSpeed9am,WindSpeed3pm,Humidity9am,Humidity3pm,Pressure9am,Pressure3pm,Cloud3pm,Temp9am,dewDiffTemp3pm,dewDiffTemp9am,diffTemp3pm9am,diffPress3pm9am,RainToday\n";
-        ofstream labels_validacao_saida("labels_validacao_podado.csv");
+        ofstream labels_validacao_saida("dados_podados_1/labels_validacao_podado.csv");
         _tratamento_("treinamento.csv", treinamento_saida, labels_treinamento_saida, tipo);
         _tratamento_("validacao.csv", validacao_saida, labels_validacao_saida, tipo);
 
     } else if (tipo == 4) {
-        ofstream treinamento_saida("treinamento_podado_2.csv");
+        ofstream treinamento_saida("dados_podados_2/treinamento_podado_2.csv");
         treinamento_saida << "Date_x,Date_y,RainFall,Sunshine,WindGustDir_x,WindGustSpeed,WindDir9am_x,WindDir9am_y,WindDir3pm_x,WindDir3pm_y,WindSpeed3pm,Humidity9am,Humidity3pm,Pressure9am,Pressure3pm,Cloud3pm,dewDiffTemp3pm,dewDiffTemp9am,diffTemp3pm9am,diffPress3pm9am\n";
-        ofstream labels_treinamento_saida("labels_treinamento_podado_2.csv");
-        ofstream validacao_saida("validacao_podado_2.csv");
+        ofstream labels_treinamento_saida("dados_podados_2/labels_treinamento_podado_2.csv");
+        ofstream validacao_saida("dados_podados_2/validacao_podado_2.csv");
         validacao_saida << "Date_x,Date_y,RainFall,Sunshine,WindGustDir_x,WindGustSpeed,WindDir9am_x,WindDir9am_y,WindDir3pm_x,WindDir3pm_y,WindSpeed3pm,Humidity9am,Humidity3pm,Pressure9am,Pressure3pm,Cloud3pm,dewDiffTemp3pm,dewDiffTemp9am,diffTemp3pm9am,diffPress3pm9am\n";
-        ofstream labels_validacao_saida("labels_validacao_podado_2.csv");
+        ofstream labels_validacao_saida("dados_podados_2/labels_validacao_podado_2.csv");
         _tratamento_("treinamento.csv", treinamento_saida, labels_treinamento_saida, tipo);
         _tratamento_("validacao.csv", validacao_saida, labels_validacao_saida, tipo);
-
-    } else {
+	} else if (tipo == 5) {
+        ofstream treinamento_saida("dados_smote_04/treinamento_podado_smote.csv");
+        treinamento_saida << "Date_x,Date_y,RainFall,Sunshine,WindGustDir_x,WindGustSpeed,WindDir9am_x,WindDir9am_y,WindDir3pm_x,WindDir3pm_y,WindSpeed3pm,Humidity9am,Humidity3pm,Pressure9am,Pressure3pm,Cloud3pm,dewDiffTemp3pm,dewDiffTemp9am,diffTemp3pm9am,diffPress3pm9am\n";
+        ofstream labels_treinamento_saida("dados_smote_04/labels_treinamento_podado_smote.csv");
+        ofstream validacao_saida("dados_smote_04/validacao_podado_smote.csv");
+        validacao_saida << "Date_x,Date_y,RainFall,Sunshine,WindGustDir_x,WindGustSpeed,WindDir9am_x,WindDir9am_y,WindDir3pm_x,WindDir3pm_y,WindSpeed3pm,Humidity9am,Humidity3pm,Pressure9am,Pressure3pm,Cloud3pm,dewDiffTemp3pm,dewDiffTemp9am,diffTemp3pm9am,diffPress3pm9am\n";
+        ofstream labels_validacao_saida("dados_smote_04/labels_validacao_podado_smote.csv");
+        _tratamento_("../SMOTE/treinamento_balanceado_04.csv", treinamento_saida, labels_treinamento_saida, tipo);
+        _tratamento_("validacao.csv", validacao_saida, labels_validacao_saida, tipo);
+        
+    } else if (tipo == 6) {
+        ofstream treinamento_saida("dados_smote_05/treinamento_podado_smote.csv");
+        treinamento_saida << "Date_x,Date_y,RainFall,Sunshine,WindGustDir_x,WindGustSpeed,WindDir9am_x,WindDir9am_y,WindDir3pm_x,WindDir3pm_y,WindSpeed3pm,Humidity9am,Humidity3pm,Pressure9am,Pressure3pm,Cloud3pm,dewDiffTemp3pm,dewDiffTemp9am,diffTemp3pm9am,diffPress3pm9am\n";
+        ofstream labels_treinamento_saida("dados_smote_05/labels_treinamento_podado_smote.csv");
+        ofstream validacao_saida("dados_smote_05/validacao_podado_smote.csv");
+        validacao_saida << "Date_x,Date_y,RainFall,Sunshine,WindGustDir_x,WindGustSpeed,WindDir9am_x,WindDir9am_y,WindDir3pm_x,WindDir3pm_y,WindSpeed3pm,Humidity9am,Humidity3pm,Pressure9am,Pressure3pm,Cloud3pm,dewDiffTemp3pm,dewDiffTemp9am,diffTemp3pm9am,diffPress3pm9am\n";
+        ofstream labels_validacao_saida("dados_smote_05/labels_validacao_podado_smote.csv");
+        _tratamento_("../SMOTE/treinamento_balanceado_05.csv", treinamento_saida, labels_treinamento_saida, tipo);
+        _tratamento_("validacao.csv", validacao_saida, labels_validacao_saida, tipo);
+        
+    } else if (tipo == 7) {
+        ofstream treinamento_saida("dados_smote_075/treinamento_podado_smote.csv");
+        treinamento_saida << "Date_x,Date_y,RainFall,Sunshine,WindGustDir_x,WindGustSpeed,WindDir9am_x,WindDir9am_y,WindDir3pm_x,WindDir3pm_y,WindSpeed3pm,Humidity9am,Humidity3pm,Pressure9am,Pressure3pm,Cloud3pm,dewDiffTemp3pm,dewDiffTemp9am,diffTemp3pm9am,diffPress3pm9am\n";
+        ofstream labels_treinamento_saida("dados_smote_075/labels_treinamento_podado_smote.csv");
+        ofstream validacao_saida("dados_smote_075/validacao_podado_smote.csv");
+        validacao_saida << "Date_x,Date_y,RainFall,Sunshine,WindGustDir_x,WindGustSpeed,WindDir9am_x,WindDir9am_y,WindDir3pm_x,WindDir3pm_y,WindSpeed3pm,Humidity9am,Humidity3pm,Pressure9am,Pressure3pm,Cloud3pm,dewDiffTemp3pm,dewDiffTemp9am,diffTemp3pm9am,diffPress3pm9am\n";
+        ofstream labels_validacao_saida("dados_smote_075/labels_validacao_podado_smote.csv");
+        _tratamento_("../SMOTE/treinamento_balanceado_075.csv", treinamento_saida, labels_treinamento_saida, tipo);
+        _tratamento_("validacao.csv", validacao_saida, labels_validacao_saida, tipo);
+        
+    } else if (tipo == 8) {
+        ofstream treinamento_saida("dados_smote_1/treinamento_podado_smote.csv");
+        treinamento_saida << "Date_x,Date_y,RainFall,Sunshine,WindGustDir_x,WindGustSpeed,WindDir9am_x,WindDir9am_y,WindDir3pm_x,WindDir3pm_y,WindSpeed3pm,Humidity9am,Humidity3pm,Pressure9am,Pressure3pm,Cloud3pm,dewDiffTemp3pm,dewDiffTemp9am,diffTemp3pm9am,diffPress3pm9am\n";
+        ofstream labels_treinamento_saida("dados_smote_1/labels_treinamento_podado_smote.csv");
+        ofstream validacao_saida("dados_smote_1/validacao_podado_smote.csv");
+        validacao_saida << "Date_x,Date_y,RainFall,Sunshine,WindGustDir_x,WindGustSpeed,WindDir9am_x,WindDir9am_y,WindDir3pm_x,WindDir3pm_y,WindSpeed3pm,Humidity9am,Humidity3pm,Pressure9am,Pressure3pm,Cloud3pm,dewDiffTemp3pm,dewDiffTemp9am,diffTemp3pm9am,diffPress3pm9am\n";
+        ofstream labels_validacao_saida("dados_smote_1/labels_validacao_podado_smote.csv");
+        _tratamento_("../SMOTE/treinamento_balanceado_1_0.csv", treinamento_saida, labels_treinamento_saida, tipo);
+        _tratamento_("validacao.csv", validacao_saida, labels_validacao_saida, tipo);
+        
+    }
+    else {
+        cout << "Tipo inválido. Selecione 1, 2, 3, 4 ou 5";
         cout << "Tipo inválido. Selecione 1, 2, 3 ou 4." << endl;
         return -1;
     }
