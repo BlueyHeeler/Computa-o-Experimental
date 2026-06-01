@@ -170,9 +170,9 @@
 
 ============================================================
 
-===============================================
-         RESULTADOS (THRESHOLD: 30%) PODADOS 2
-===============================================
+=============================================
+         RESULTADOS (THRESHOLD: 30%) PODADO 2
+=============================================
 Total de dias avaliados:        339
 Acurácia Global:                89.0855%
 Recall  (Sensibilidade Chuva):  74.6667%
@@ -180,11 +180,99 @@ Precisão (Acerto do Alarme):    75.6757%
 F1-Score:                       75.1678%
 
 --- Matriz de Confusão ---
-                 | Realidade: Choveu  | Realidade: Sol
------------------|--------------------|----------------
-Previu: Chuva(1) | TP: 56             | FP: 18 (Alarme Falso)
+                 | Realidade: Choveu | Realidade: Sol
+-----------------|-------------------|----------------
+Previu: Chuva(1) | TP: 56          | FP: 18 (Alarme Falso)
 Previu: Sol  (0) | FN: 19 (Não avisou)| TN: 246
-=======================================================
+=============================================
+
+==============================================
+   INICIANDO GRID SEARCH (30 combinações)
+==============================================
+Trees   LeafSize    F1(%)     Recall(%) Precisão(%)  Acurácia(%)
+------------------------------------------------------------------
+50      5           73.83     73.33     74.32         88.50         ← novo melhor
+50      10          74.32     73.33     75.34         88.79         ← novo melhor
+50      14          76.51     76.00     77.03         89.68         ← novo melhor
+50      20          74.32     73.33     75.34         88.79       
+50      30          73.68     74.67     72.73         88.20       
+50      50          73.10     70.67     75.71         88.50       
+100     5           75.17     74.67     75.68         89.09       
+100     10          74.83     73.33     76.39         89.09       
+100     14          76.82     77.33     76.32         89.68         ← novo melhor
+100     20          71.83     68.00     76.12         88.20       
+100     30          72.73     69.33     76.47         88.50       
+100     50          74.48     72.00     77.14         89.09       
+150     5           74.67     74.67     74.67         88.79       
+150     10          74.32     73.33     75.34         88.79       
+150     14          76.51     76.00     77.03         89.68       
+150     20          75.34     73.33     77.46         89.38       
+150     30          74.48     72.00     77.14         89.09       
+150     50          73.97     72.00     76.06         88.79       
+200     5           75.17     74.67     75.68         89.09       
+200     10          73.97     72.00     76.06         88.79       
+200     14          75.68     74.67     76.71         89.38       
+200     20          74.83     73.33     76.39         89.09       
+200     30          76.39     73.33     79.71         89.97       
+200     50          70.92     66.67     75.76         87.91       
+300     5           74.32     73.33     75.34         88.79       
+300     10          74.83     73.33     76.39         89.09       
+300     14          75.17     74.67     75.68         89.09       
+300     20          75.34     73.33     77.46         89.38       
+300     30          73.97     72.00     76.06         88.79       
+300     50          73.24     69.33     77.61         88.79       
+==================================================================
+
+🏆  MELHOR COMBINAÇÃO ENCONTRADA:
+----------------------------------------------
+  numTrees        = 100
+  minimumLeafSize = 14
+  F1-Score        = 76.8212%
+  Recall          = 77.3333%
+  Precisão        = 76.3158%
+  Acurácia Global = 89.6755%
+=============================================
+
+============================================================
+   RESULTADOS FINAIS — MÉDIA DE 1000 RODADAS
+   Tipo: AUGMENTED (PODADO 2 + SMOTE 0.4)
+   Threshold: 35%
+============================================================
+
+--- Estatísticas do F1-Score (chuva) ---
+  Média:         76.6008%
+  Desvio Padrão: 1.20415%
+  Mínimo:        72.6027%
+  Máximo:        80%
+
+--- Importância Média das Features (por permutação) ---
+  (ordenado da mais para a menos importante)
+  Queda no F1 = quanto o modelo piora ao remover a feature
+
+  1.	Sunshine            	Queda média no F1: 6.43926%
+  2.	DewDiff3pm          	Queda média no F1: 6.28776%
+  3.	Humidity3pm         	Queda média no F1: 5.67577%
+  4.	WindGustSpeed       	Queda média no F1: 2.82206%
+  5.	Cloud3pm            	Queda média no F1: 2.15791%
+  6.	Pressure3pm         	Queda média no F1: 1.89058%
+  7.	TempRise            	Queda média no F1: 1.62641%
+  8.	Humidity9am         	Queda média no F1: 1.51608%
+  9.	DewDiff9am          	Queda média no F1: 1.32132%
+  10.	WindDir3pm_x        	Queda média no F1: 1.10987%
+  11.	PressureDrop        	Queda média no F1: 1.07438%
+  12.	Rainfall            	Queda média no F1: 0.800316%
+  13.	WindDir9am_x        	Queda média no F1: 0.658314%
+  14.	Pressure9am         	Queda média no F1: 0.548958%
+  15.	Date_y              	Queda média no F1: 0.477643%
+  16.	WindSpeed3pm        	Queda média no F1: 0.434421%
+  17.	WindDir3pm_y        	Queda média no F1: 0.280732%
+  18.	Date_x              	Queda média no F1: 0.266106%
+  19.	WindGustDir_x       	Queda média no F1: 0.184829%
+  20.	WindDir9am_y        	Queda média no F1: 0.01388%
+
+============================================================
+
+
 
 
 

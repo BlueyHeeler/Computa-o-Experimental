@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <fstream>
 #include <vector>
+#include <random>
 #include <string>
 #include <mlpack/core.hpp>
 #include <mlpack/methods/random_forest/random_forest.hpp>
@@ -11,7 +12,21 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-    mlpack::RandomSeed(0);
+    int tipo = 0;
+    if (argc > 1) {
+        tipo = stoi(argv[1]);
+    } else {
+        cout << "adicione um tipo";
+        return 1;
+    }
+    if (tipo < 1 || tipo > 5) {
+        cout << "Tipo inválido. Use 1, 2, 3, 4 ou 5." << endl;
+        return 1;
+    }
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<> distr(1, 1000000);
+    mlpack::RandomSeed(distr(gen));
 
     RandomForest<> rf;
 
@@ -23,16 +38,48 @@ int main(int argc, char* argv[])
 
     arma::Row<size_t> predictions;
     arma::mat probabilities;
-
-    data::Load("dados_podados_2/treinamento_podado_2.csv",          train_dataset,      true);
-    data::Load("dados_podados_2/labels_treinamento_podado_2.csv",   train_labels,       true);
-
-    data::Load("dados_podados_2/validacao_podado_2.csv",            validation_dataset, true);
-    data::Load("dados_podados_2/labels_validacao_podado_2.csv",     validation_labels,  true); // ✅ corrigido
-
+    // Como todos já estão podados eles utilizam o mesmo conjunto de validação.
+    if(tipo == 1) {
+        data::Load("../csv/dados_podados_2/treinamento_podado_2.csv",          train_dataset,      true);
+        data::Load("../csv/dados_podados_2/labels_treinamento_podado_2.csv",   train_labels,       true);
+    } else if(tipo == 2){
+        data::Load("../csv/dados_smote_04/treinamento_podado_smote.csv",          train_dataset,      true);
+        data::Load("../csv/dados_smote_04/labels_treinamento_podado_smote.csv",   train_labels,       true);      
+    } else if(tipo == 3){
+        data::Load("../csv/dados_smote_05/treinamento_podado_smote.csv",          train_dataset,      true);
+        data::Load("../csv/dados_smote_05/labels_treinamento_podado_smote.csv",   train_labels,       true);  
+    } else if(tipo == 4){
+        data::Load("../csv/dados_smote_075/treinamento_podado_smote.csv",          train_dataset,      true);
+        data::Load("../csv/dados_smote_075/labels_treinamento_podado_smote.csv",   train_labels,       true);  
+    } else if(tipo == 5){
+        data::Load("../csv/dados_smote_1/treinamento_podado_smote.csv",          train_dataset,      true);
+        data::Load("../csv/dados_smote_1/labels_treinamento_podado_smote.csv",   train_labels,       true);  
+    }
+        data::Load("dados_podados_2/validacao_podado_2.csv",            validation_dataset, true);
+        data::Load("dados_podados_2/labels_validacao_podado_2.csv",     validation_labels,  true);
     double weightNoRain = 1.0;
-    double weightRain   = 77.9244 / 22.0756;
-
+    double weightRain = 0;
+    double threshold = 0.30;
+    if (tipo == 1){
+        weightRain   = 3.53;
+        threshold    = 0.30;
+    }
+    if (tipo == 2){
+        weightRain   = 2.50;
+        threshold    = 0.35;
+    }
+    if (tipo == 3){
+        weightRain   = 2.0;
+        threshold    = 0.4;
+    }
+    if (tipo == 4){
+        weightRain   = 1.33;
+        threshold = 0.43;
+    }
+    if (tipo == 5){
+        weightRain   = 1;
+        threshold = 0.5;
+    }
     arma::rowvec weights(train_labels.n_elem);
     for (size_t i = 0; i < train_labels.n_elem; ++i)
         weights[i] = (train_labels[i] == 0) ? weightNoRain : weightRain;
@@ -45,7 +92,6 @@ int main(int argc, char* argv[])
     rf.Classify(validation_dataset, predictions, probabilities);
 
     arma::Row<size_t> my_predictions(validation_labels.n_elem);
-    double threshold = 0.30;
 
 	ofstream file("probabilidades.csv");
 	
@@ -76,9 +122,13 @@ int main(int argc, char* argv[])
                       ? (double)truePositives / (truePositives + falsePositives) * 100.0 : 0;
     double f1       = (recall + precisao > 0)
                       ? 2.0 * (recall * precisao) / (recall + precisao) : 0;
-
+    string tipo_str = (tipo == 1) ? "PODADO 2" :
+                  (tipo == 2) ? "SMOTE 0.4" :
+                  (tipo == 3) ? "SMOTE 0.5" :
+                  (tipo == 4) ? "SMOTE 0.75" :
+                                "SMOTE 1.0";
     cout << "\n=============================================" << endl;
-    cout << "         RESULTADOS (THRESHOLD: " << threshold * 100 << "%)" << endl;
+    cout << "         RESULTADOS (THRESHOLD: " << threshold * 100 << "%)" << " " << tipo_str << endl;
     cout << "=============================================" << endl;
     cout << "Total de dias avaliados:        " << validation_labels.n_elem << endl;
     cout << "Acurácia Global:                " << acuraciaTotal << "%" << endl;
@@ -98,7 +148,7 @@ int main(int argc, char* argv[])
     //   Testa combinações de numTrees x minimumLeafSize
     //   e retorna a de maior F1-Score
     // =========================================================
-
+	/*
     const std::vector<size_t> candidatesTrees    = {50, 100, 150, 200, 300};
     const std::vector<size_t> candidatesLeafSize = {5, 10, 14, 20, 30, 50};
 
@@ -191,6 +241,6 @@ int main(int argc, char* argv[])
     cout << "  Precisão        = " << best.precision << "%" << endl;
     cout << "  Acurácia Global = " << best.accuracy  << "%" << endl;
     cout << "=============================================\n" << endl;
-
+	*/
     return 0;
 }
