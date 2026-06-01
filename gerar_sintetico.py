@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Gera dados sinteticos de dias de chuva via copula gaussiana.
-Base:      dataset PODADO 2 (20 features, melhor configuracao).
+Gera dados sintéticos de dias de chuva via cópula gaussiana.
+Base:      dataset PODADO 2 (20 features, melhor configuração).
 Quantidade: suficiente para balancear as classes 1:1.
-Saida:     mlpack/dados_augmented/
+Saída:     mlpack/dados_augmented/
 """
 
 import numpy as np
@@ -12,9 +12,25 @@ from scipy import stats
 import os
 
 SEED = 42
-TRAIN_FEATURES = "mlpack/dados_podados_2/treinamento_podado_2.csv"
-TRAIN_LABELS   = "mlpack/dados_podados_2/labels_treinamento_podado_2.csv"
+
+TRAIN_FEATURES = "mlpack/dados_com_feature/treinamento_tratado_com.csv"
+TRAIN_LABELS   = "mlpack/dados_com_feature/labels_treinamento_com.csv"
 OUT_DIR        = "mlpack/dados_augmented"
+
+# Colunas do PODADO 2 — subconjunto que será usado no treinamento do RF
+PODADO2_COLS = [
+    "Date_x", "Date_y",
+    "RainFall", "Sunshine",
+    "WindGustDir_x", "WindGustSpeed",
+    "WindDir9am_x", "WindDir9am_y",
+    "WindDir3pm_x", "WindDir3pm_y",
+    "WindSpeed3pm",
+    "Humidity9am", "Humidity3pm",
+    "Pressure9am", "Pressure3pm",
+    "Cloud3pm",
+    "dewDiffTemp3pm", "dewDiffTemp9am",
+    "diffTemp3pm9am", "diffPress3pm9am",
+]
 
 
 def gaussian_copula_sample(
@@ -23,13 +39,13 @@ def gaussian_copula_sample(
     rng: np.random.Generator,
 ) -> pd.DataFrame:
     """
-    Estima uma copula gaussiana a partir de X_ref e amostra n_samples pontos.
+    Estima uma cópula gaussiana a partir de X_ref e amostra n_samples pontos.
 
     Passos:
       1. Rank transform -> uniforme em (0,1)
-      2. Probit          -> normal padrao
-      3. Correlacao      -> normal multivariada com estrutura aprendida
-      4. Normal -> uniforme -> espaco original via quantil empirico
+      2. Probit          -> normal padrão
+      3. Correlação      -> normal multivariada com estrutura aprendida
+      4. Normal -> uniforme -> espaço original via quantil empírico
     """
     n, d = X_ref.shape
     X = X_ref.values.astype(float)
@@ -42,7 +58,7 @@ def gaussian_copula_sample(
     # Passo 2 — probit
     Z = stats.norm.ppf(U)
 
-    # Passo 3 — matriz de correlacao (garante positiva semi-definida)
+    # Passo 3 — matriz de correlação (garante positiva semi-definida)
     R = np.corrcoef(Z.T)
     R = (R + R.T) / 2
     min_eig = np.linalg.eigvalsh(R).min()
@@ -51,7 +67,7 @@ def gaussian_copula_sample(
 
     Z_new = rng.multivariate_normal(np.zeros(d), R, size=n_samples)
 
-    # Passo 4 — inverter via CDF empirica (interpolacao)
+    # Passo 4 — inverter via CDF empírica (interpolação)
     U_new = np.clip(stats.norm.cdf(Z_new), 1e-10, 1 - 1e-10)
     X_new = np.zeros((n_samples, d))
     for j in range(d):
@@ -65,8 +81,11 @@ def gaussian_copula_sample(
 def main() -> None:
     rng = np.random.default_rng(SEED)
 
-    X = pd.read_csv(TRAIN_FEATURES)
-    y = pd.read_csv(TRAIN_LABELS, header=None, names=["label"])
+    X_full = pd.read_csv(TRAIN_FEATURES)
+    y      = pd.read_csv(TRAIN_LABELS, header=None, names=["label"])
+
+    # RainToday não faz parte do PODADO 2; remover antes de aprender a cópula
+    X_full = X_full.drop(columns=["RainToday"], errors="ignore")
 
     n_rain    = int((y["label"] == 1).sum())
     n_no_rain = int((y["label"] == 0).sum())
@@ -74,19 +93,26 @@ def main() -> None:
 
     print(f"Dias com chuva  (real):  {n_rain}")
     print(f"Dias sem chuva  (real):  {n_no_rain}")
-    print(f"Amostras sinteticas:     {n_synth}")
-    print(f"Features:                {X.shape[1]}")
+    print(f"Amostras sintéticas:     {n_synth}")
+    print(f"Features (cópula):       {X_full.shape[1]}  (todos os pares x/y intactos)")
 
-    X_rain = X[y["label"].values == 1].reset_index(drop=True)
+    # Aprender a cópula nas 28 features completas (pares direcionais preservados)
+    X_rain_full = X_full[y["label"].values == 1].reset_index(drop=True)
 
-    print("\nGerando amostras via copula gaussiana...")
-    X_synth = gaussian_copula_sample(X_rain, n_synth, rng)
+    print("\nGerando amostras via cópula gaussiana...")
+    X_synth_full = gaussian_copula_sample(X_rain_full, n_synth, rng)
+
+    # Selecionar apenas as 20 colunas do PODADO 2 para saída
+    X_real  = X_full[PODADO2_COLS]
+    X_synth = X_synth_full[PODADO2_COLS]
+    X_rain  = X_rain_full[PODADO2_COLS]
+
     y_synth = pd.DataFrame({"label": np.ones(n_synth, dtype=int)})
 
-    X_aug = pd.concat([X, X_synth], ignore_index=True)
-    y_aug = pd.concat([y, y_synth], ignore_index=True)
+    X_aug = pd.concat([X_real, X_synth], ignore_index=True)
+    y_aug = pd.concat([y,      y_synth], ignore_index=True)
 
-    # Embaralhar para nao deixar todos os sinteticos no final
+    # Embaralhar para não deixar todos os sintéticos no final
     perm  = rng.permutation(len(X_aug))
     X_aug = X_aug.iloc[perm].reset_index(drop=True)
     y_aug = y_aug.iloc[perm].reset_index(drop=True)
@@ -101,9 +127,9 @@ def main() -> None:
     print(f"  Sem chuva (0): {dist[0]}")
     print(f"  Com chuva (1): {dist[1]}")
 
-    # Verificacao de sanidade: medias deveriam ser parecidas
-    print("\n--- Verificacao: medias reais vs sinteticas (dias de chuva) ---")
-    for col in X.columns:
+    # Verificação de sanidade: médias deveriam ser parecidas
+    print("\n--- Verificação: médias reais vs sintéticas (dias de chuva, PODADO 2) ---")
+    for col in PODADO2_COLS:
         mu_real  = X_rain[col].mean()
         std_real = X_rain[col].std() + 1e-9
         mu_synth = X_synth[col].mean()
