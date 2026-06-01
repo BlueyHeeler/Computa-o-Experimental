@@ -15,7 +15,7 @@ SEED = 42
 
 TRAIN_FEATURES = "mlpack/dados_com_feature/treinamento_tratado_com.csv"
 TRAIN_LABELS   = "mlpack/dados_com_feature/labels_treinamento_com.csv"
-OUT_DIR        = "mlpack/dados_augmented"
+OUT_DIR        = "csv/dados_augmented"
 
 # Colunas do PODADO 2 — subconjunto que será usado no treinamento do RF
 PODADO2_COLS = [
