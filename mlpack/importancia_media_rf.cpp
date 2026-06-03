@@ -74,8 +74,8 @@ int main(int argc, char* argv[])
         cout << "Uso: " << argv[0] << " <tipo>  (1=sem FE, 2=com FE, 3=podado1, 4=podado2, 5=augmented)" << endl;
         return 1;
     }
-    if (tipo < 1 || tipo > 8) {
-        cout << "Tipo inválido. Use 1, 2, 3, 4, 5, 6, 7, 8." << endl;
+    if (tipo < 1 || tipo > 12) {
+        cout << "Tipo inválido. Use 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12." << endl;
         return 1;
     }
 
@@ -96,10 +96,10 @@ int main(int argc, char* argv[])
         path_val_data     = "../csv/dados_com_feature/validacao_tratado_com.csv";
         path_val_labels   = "../csv/dados_com_feature/labels_validacao_com.csv";
     } else if(tipo == 3){
-    	path_train_data   = "../csv/dados_podados/treinamento_podado.csv";
-        path_train_labels = "../csv/dados_podados/labels_treinamento_podado.csv";
-        path_val_data     = "../csv/dados_podados/validacao_podado.csv";
-        path_val_labels   = "../csv/dados_podados/labels_validacao_podado.csv";
+    	path_train_data   = "../csv/dados_podados_1/treinamento_podado.csv";
+        path_train_labels = "../csv/dados_podados_1/labels_treinamento_podado.csv";
+        path_val_data     = "../csv/dados_podados_1/validacao_podado.csv";
+        path_val_labels   = "../csv/dados_podados_1/labels_validacao_podado.csv";
     } else if(tipo == 4){
     	path_train_data   = "../csv/dados_podados_2/treinamento_podado_2.csv";
         path_train_labels = "../csv/dados_podados_2/labels_treinamento_podado_2.csv";
@@ -124,6 +124,26 @@ int main(int argc, char* argv[])
         path_train_data   = "../csv/dados_smote_1/treinamento_podado_smote.csv";
         path_train_labels = "../csv/dados_smote_1/labels_treinamento_podado_smote.csv";
         path_val_data     = "../csv/dados_smote_1/validacao_podado_smote.csv";
+        path_val_labels   = "../csv/dados_smote_1/labels_validacao_podado_smote.csv";
+    } else if(tipo == 9){
+        path_train_data   = "../csv/dados_gaussian_04/treinamento_augmented.csv";
+        path_train_labels = "../csv/dados_gaussian_04/labels_treinamento_augmented.csv";
+        path_val_data     = "../csv/dados_smote_1/validacao_podado_smote.csv";			// Pode ser a mesma 
+        path_val_labels   = "../csv/dados_smote_1/labels_validacao_podado_smote.csv";
+    } else if(tipo == 10){
+        path_train_data   = "../csv/dados_gaussian_05/treinamento_augmented.csv";
+        path_train_labels = "../csv/dados_gaussian_05/labels_treinamento_augmented.csv";
+        path_val_data     = "../csv/dados_smote_1/validacao_podado_smote.csv";			// Pode ser a mesma 
+        path_val_labels   = "../csv/dados_smote_1/labels_validacao_podado_smote.csv";
+    } else if(tipo == 11){
+        path_train_data   = "../csv/dados_gaussian_075/treinamento_augmented.csv";
+        path_train_labels = "../csv/dados_gaussian_075/labels_treinamento_augmented.csv";
+        path_val_data     = "../csv/dados_smote_1/validacao_podado_smote.csv";			// Pode ser a mesma 
+        path_val_labels   = "../csv/dados_smote_1/labels_validacao_podado_smote.csv";
+    } else if(tipo == 12){
+        path_train_data   = "../csv/dados_gaussian_1/treinamento_augmented.csv";
+        path_train_labels = "../csv/dados_gaussian_1/labels_treinamento_augmented.csv";
+        path_val_data     = "../csv/dados_smote_1/validacao_podado_smote.csv";			// Pode ser a mesma 
         path_val_labels   = "../csv/dados_smote_1/labels_validacao_podado_smote.csv";
     }
 
@@ -196,7 +216,7 @@ int main(int argc, char* argv[])
             "TempRise", "PressureDrop",
             "RainToday"	    	
         }; // 23 features
-    } else if (tipo == 4 || tipo == 5 || tipo == 6 || tipo == 7 || tipo == 8){
+    } else if (tipo == 4 || tipo == 5 || tipo == 6 || tipo == 7 || tipo == 8 || tipo == 9 || tipo == 10 || tipo == 11 || tipo == 12){
     	feature_names = {
             "Date_x", "Date_y",
             "Rainfall", "Sunshine",
@@ -222,23 +242,22 @@ int main(int argc, char* argv[])
     arma::rowvec weights(trainLabels.n_elem, arma::fill::ones);
     double weightRain = 3.53;
     double threshold = 0.30;
-    if (tipo == 5){
+    if (tipo == 5 || tipo == 9){
         weightRain   = 2.50;
         threshold    = 0.35;
     }
-    if (tipo == 6){
+    if (tipo == 6 || tipo == 10){
         weightRain   = 2.0;
         threshold    = 0.4;
     }
-    if (tipo == 7){
+    if (tipo == 7 || tipo == 11){
         weightRain   = 1.33;
         threshold = 0.43;
     }
-    if (tipo == 8){
-        weightRain   = 1;
+    if (tipo == 8 || tipo == 12){
+        weightRain = 1;
         threshold = 0.5;
     }
-
     for (size_t i = 0; i < trainLabels.n_elem; ++i)
         if (trainLabels[i] == 1)
             weights[i] = weightRain;
@@ -250,7 +269,7 @@ int main(int argc, char* argv[])
     const size_t numTrees         = 100;
     const size_t minimumLeafSize  = 14;
     // Threshold está definido acima
-    const int    NUM_RUNS         = 50;
+    const int    NUM_RUNS         = 1000;
 
     // -----------------------------------------------------------------------
     // 6. Acumuladores
@@ -266,7 +285,7 @@ int main(int argc, char* argv[])
     uniform_int_distribution<> distr(1, 1000000);
 
     // -----------------------------------------------------------------------
-    // 7. Loop principal: 100 execuções
+    // 7. Loop principal: 1000 execuções
     // -----------------------------------------------------------------------
     for (int run = 1; run <= NUM_RUNS; ++run)
     {
@@ -339,14 +358,18 @@ int main(int argc, char* argv[])
     cout << "\n\n============================================================" << endl;
     cout << "   RESULTADOS FINAIS — MÉDIA DE " << NUM_RUNS << " RODADAS" << endl;
     string tipo_label;
-    if      (tipo == 1) tipo_label = "SEM feature engineering";
-    else if (tipo == 2) tipo_label = "COM feature engineering";
-    else if (tipo == 3) tipo_label = "COM feature engineering PODADO 1";
-    else if (tipo == 4) tipo_label = "COM feature engineering PODADO 2";
-    else if (tipo == 5) tipo_label = "AUGMENTED (PODADO 2 + SMOTE 0.4)";
-    else if (tipo == 6) tipo_label = "AUGMENTED (PODADO 2 + SMOTE 0.5)";
-    else if (tipo == 7) tipo_label = "AUGMENTED (PODADO 2 + SMOTE 0.75)";
-    else if (tipo == 8) tipo_label = "AUGMENTED (PODADO 2 + SMOTE 1.0)";
+    if      (tipo == 1) tipo_label = "SEM FEATURE ENGINEERING";
+    else if (tipo == 2) tipo_label = "COM FEATURE ENGINEERING";
+    else if (tipo == 3) tipo_label = "COM FEATURE ENGINEERING PODADO 1";
+    else if (tipo == 4) tipo_label = "COM FEATURE ENGINEERING PODADO 2";
+    else if (tipo == 5) tipo_label = "AUGMENTED PODADO 2 + SMOTE 0.4";
+    else if (tipo == 6) tipo_label = "AUGMENTED PODADO 2 + SMOTE 0.5";
+    else if (tipo == 7) tipo_label = "AUGMENTED PODADO 2 + SMOTE 0.75";
+    else if (tipo == 8) tipo_label = "AUGMENTED PODADO 2 + SMOTE 1.0";
+    else if (tipo == 9) tipo_label = "AUGMENTED PODADO 2 + CÓPULA GAUSSIANA 0.4 ";
+    else if (tipo == 9) tipo_label = "AUGMENTED PODADO 2 + CÓPULA GAUSSIANA 0.5";
+    else if (tipo == 9) tipo_label = "AUGMENTED PODADO 2 + CÓPULA GAUSSIANA 0.75";
+    else if (tipo == 9) tipo_label = "AUGMENTED PODADO 2 + CÓPULA GAUSSIANA 1.0";
     cout << "   Tipo: " << tipo_label << endl;
     cout << "   Threshold: " << threshold * 100.0 << "%" << endl;
     cout << "============================================================" << endl;

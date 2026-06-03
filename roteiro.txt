@@ -1,0 +1,46 @@
+Definição do Problema e Objetivos:
+	- Objetivo: prever se irá chover no dia x + 1, dado um dia x e suas variáveis.
+	- Tipo de problema: Problema de classificação (RainTomorrow: "Yes", "No")
+
+Coleta/Origem dos Dados:
+	- Dados retirados do Kaggle dataset Rain in Australia, https://www.kaggle.com/datasets/jsphyg/weather-dataset-rattle-package
+		- Foi considerado apenas dados da cidade de Brisbane 
+	- Não foi observado dados repetidos no dataset 
+	- Linhas com dados NaN são removidas 
+		- Treinamento: 
+		- Total de linhas deletadas: 193
+		- Validacao: 
+		- Total de linhas deletadas: 27
+	- O dataset é bastante desbalanceado NoRain ≃ 78% e Rain ≃ 22%
+
+Divisão treinamento e validação:
+	- Treino ≃ 87% (2009-01-01 -> 2015-12-31)
+	- Validacao ≃ 13% (2016-01-01 -> 2016-12-31)
+
+Feature Engineering:
+	- Dados como WindDir (direção do vento) e Date (data) foram transformados em um par ordenado de variáveis seno e cosseno para garantir a circularidade dessas variáveis.
+	Ex: 31 de Dezembro e 1 de Janeiro parecem distantes mas são próximos.
+	- Dados criados a partir de dados existentes DewDiff9am(Temperatura de Orvalho - Temperatura9AM), DewDiff3pm, PressureDrop (Pressão9am - Pressão3pm), TempRise (Temperature9am - Temperature3pm)
+
+Treinamento:
+	- Foi utilizado o algoritmo Random Forest em c++ biblioteca mlpack
+		- numTrees        = 100
+  		- minimumLeafSize = 14
+		- eses foram os melhores parâmetros encontrados.
+	- Geração de dados sintéticos
+		- SMOTE
+		- Cópula Gaussiana
+		
+Métodos de avaliação:
+	- Foi utilizado a acurácia e o F1-Score (média harmônica entre Precisão e Recall) para avaliar o modelo.
+
+Resultados:
+	- Foram feitos diversos testes para averiguar o modelo.
+	- Timeline:
+		- Sem Feature Engineering
+		- Com Feature Engineering
+		- Poda 1
+		- Poda 2
+		- Poda 2 + Adicionando dados sintéticos(SMOTE) na classe desbalanceada no treinamento.
+			- Aumentar ligeiramente a quantidade de dados sintéticos na classe desbalanceada(0.4) no dataset de treinamento resultou em melhora do F1-Score
+			- Porém aumentos sequentes causaram perda de performance no programa.

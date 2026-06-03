@@ -28,5 +28,3 @@ media_podado_2:
 sintetico:
 	python3 ../gerar_sintetico.py
 
-media_augmented:
-	./importancia_media 5

@@ -2,7 +2,7 @@
 """
 Gera dados sintéticos de dias de chuva via cópula gaussiana.
 Base:      dataset PODADO 2 (20 features, melhor configuração).
-Quantidade: suficiente para balancear as classes 1:1.
+Controle:  Permite definir o ratio de balanceamento desejado.
 Saída:     mlpack/dados_augmented/
 """
 
@@ -13,9 +13,12 @@ import os
 
 SEED = 42
 
-TRAIN_FEATURES = "mlpack/dados_com_feature/treinamento_tratado_com.csv"
-TRAIN_LABELS   = "mlpack/dados_com_feature/labels_treinamento_com.csv"
-OUT_DIR        = "csv/dados_augmented"
+TRAIN_FEATURES = "csv/dados_com_feature/treinamento_tratado_com.csv"
+TRAIN_LABELS   = "csv/dados_com_feature/labels_treinamento_com.csv"
+OUT_DIR        = "csv/dados_augmented_gaussian"
+
+# Controle de balanceamento (1.0 = 1:1, 0.7 = minoritária com 70% do tamanho da majoritária)
+TARGET_RATIO = 0.4 
 
 # Colunas do PODADO 2 — subconjunto que será usado no treinamento do RF
 PODADO2_COLS = [
@@ -47,6 +50,9 @@ def gaussian_copula_sample(
       3. Correlação      -> normal multivariada com estrutura aprendida
       4. Normal -> uniforme -> espaço original via quantil empírico
     """
+    if n_samples <= 0:
+        return pd.DataFrame(columns=X_ref.columns)
+
     n, d = X_ref.shape
     X = X_ref.values.astype(float)
 
@@ -89,22 +95,31 @@ def main() -> None:
 
     n_rain    = int((y["label"] == 1).sum())
     n_no_rain = int((y["label"] == 0).sum())
-    n_synth   = n_no_rain - n_rain  # balancear para 1:1
+    
+    # Nova lógica de proporção alvo
+    target_minority = int(n_no_rain * TARGET_RATIO)
+    n_synth         = max(0, target_minority - n_rain)
 
     print(f"Dias com chuva  (real):  {n_rain}")
     print(f"Dias sem chuva  (real):  {n_no_rain}")
+    print(f"Proporção Alvo:          {TARGET_RATIO * 100:.1f}% da classe majoritária")
     print(f"Amostras sintéticas:     {n_synth}")
     print(f"Features (cópula):       {X_full.shape[1]}  (todos os pares x/y intactos)")
 
-    # Aprender a cópula nas 28 features completas (pares direcionais preservados)
-    X_rain_full = X_full[y["label"].values == 1].reset_index(drop=True)
-
-    print("\nGerando amostras via cópula gaussiana...")
-    X_synth_full = gaussian_copula_sample(X_rain_full, n_synth, rng)
+    # Se já atingiu a proporção, o código apenas salva os dados originais no formato esperado
+    if n_synth == 0:
+        print("\nA quantidade de dados reais já atinge a proporção desejada. Nenhuma amostra gerada.")
+        X_synth_full = pd.DataFrame(columns=X_full.columns)
+        X_rain_full = X_full[y["label"].values == 1].reset_index(drop=True)
+    else:
+        # Aprender a cópula nas 28 features completas (pares direcionais preservados)
+        X_rain_full = X_full[y["label"].values == 1].reset_index(drop=True)
+        print("\nGerando amostras via cópula gaussiana...")
+        X_synth_full = gaussian_copula_sample(X_rain_full, n_synth, rng)
 
     # Selecionar apenas as 20 colunas do PODADO 2 para saída
     X_real  = X_full[PODADO2_COLS]
-    X_synth = X_synth_full[PODADO2_COLS]
+    X_synth = X_synth_full[PODADO2_COLS] if n_synth > 0 else pd.DataFrame(columns=PODADO2_COLS)
     X_rain  = X_rain_full[PODADO2_COLS]
 
     y_synth = pd.DataFrame({"label": np.ones(n_synth, dtype=int)})
@@ -124,18 +139,19 @@ def main() -> None:
     dist = y_aug["label"].value_counts().sort_index()
     print(f"\nSalvo em '{OUT_DIR}/'")
     print(f"Total de amostras: {len(X_aug)}")
-    print(f"  Sem chuva (0): {dist[0]}")
-    print(f"  Com chuva (1): {dist[1]}")
+    print(f"  Sem chuva (0): {dist.get(0, 0)}")
+    print(f"  Com chuva (1): {dist.get(1, 0)}")
 
-    # Verificação de sanidade: médias deveriam ser parecidas
-    print("\n--- Verificação: médias reais vs sintéticas (dias de chuva, PODADO 2) ---")
-    for col in PODADO2_COLS:
-        mu_real  = X_rain[col].mean()
-        std_real = X_rain[col].std() + 1e-9
-        mu_synth = X_synth[col].mean()
-        diff_pct = abs(mu_synth - mu_real) / std_real * 100
-        flag = "  << DIVERGENTE" if diff_pct > 15 else ""
-        print(f"  {col:<22}  real={mu_real:8.3f}  synth={mu_synth:8.3f}  diff={diff_pct:5.1f}%{flag}")
+    if n_synth > 0:
+        # Verificação de sanidade: médias deveriam ser parecidas
+        print("\n--- Verificação: médias reais vs sintéticas (dias de chuva, PODADO 2) ---")
+        for col in PODADO2_COLS:
+            mu_real  = X_rain[col].mean()
+            std_real = X_rain[col].std() + 1e-9
+            mu_synth = X_synth[col].mean()
+            diff_pct = abs(mu_synth - mu_real) / std_real * 100
+            flag = "  << DIVERGENTE" if diff_pct > 15 else ""
+            print(f"  {col:<22}  real={mu_real:8.3f}  synth={mu_synth:8.3f}  diff={diff_pct:5.1f}%{flag}")
 
 
 if __name__ == "__main__":
