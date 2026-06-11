@@ -1,7 +1,5 @@
 tratamento:
-	g++ -std=c++17 -o tratamento tratamento.cpp
+	g++ -std=c++17 tratamento.cpp -o tratamento
 
-analise:
-	g++ -std=c++17 -o analise_da_chuva analise_da_chuva.cpp
-	./analise_da_chuva 
-	
+analise_chuva:
+	g++ -std=c++17 analise_da_chuva.cpp -o analise_da_chuva

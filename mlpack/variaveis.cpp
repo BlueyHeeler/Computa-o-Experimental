@@ -55,8 +55,8 @@ int main(int argc, char* argv[])
         data::Load("../csv/dados_smote_1/treinamento_podado_smote.csv",          train_dataset,      true);
         data::Load("../csv/dados_smote_1/labels_treinamento_podado_smote.csv",   train_labels,       true);  
     }
-        data::Load("dados_podados_2/validacao_podado_2.csv",            validation_dataset, true);
-        data::Load("dados_podados_2/labels_validacao_podado_2.csv",     validation_labels,  true);
+        data::Load("../csv/dados_podados_2/validacao_podado_2.csv",            validation_dataset, true);
+        data::Load("../csv/dados_podados_2/labels_validacao_podado_2.csv",     validation_labels,  true);
     double weightNoRain = 1.0;
     double weightRain = 0;
     double threshold = 0.30;
